@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# Climate Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple and clean React application that displays current weather conditions and a 5-day forecast based on a U.S. ZIP code.
 
-Currently, two official plugins are available:
+The goal of this project was to focus on clear UI, predictable data flow, and good user experience when handling loading and error states.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+- Node.js (v18 or newer recommended)
+- npm
 
-## Expanding the ESLint configuration
+### Steps to run the project
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Clone the repository
+   ```bash
+   git clone <repository-url>
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. Install dependencies
+    npm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. Start the development server
+    npm run dev
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+4. Open the app in your browser
+    Vite will output a local URL (usually http://localhost:5173).
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Setup Notes
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+No API keys are required to run this project.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The app uses public APIs and works out of the box after installing dependencies.
+
+Styling is done with SCSS and imported globally.
+
+APIs Used
+
+Zippopotam.us
+Used to convert a U.S. ZIP code into city, state, latitude, and longitude.
+
+Open-Meteo
+Used to fetch current weather data and a daily forecast based on latitude and longitude.
+
+Assumptions & Technical Decisions
+
+ZIP codes
+
+The app assumes valid U.S. 5-digit ZIP codes only.
+
+Basic client-side validation is applied before making requests.
+
+Temperature units
+
+All temperatures are stored internally in Celsius.
+
+Fahrenheit conversion happens only at render time to keep calculations consistent.
+
+Weather data
+
+Only the first 5 days of the daily forecast are displayed, even if the API returns more.
+
+Weather condition codes from Open-Meteo are mapped to icons using a simplified grouping approach.
+
+State management
+
+React useState is used for simplicity since the app scope is small.
+
+The UI explicitly handles idle, loading, success, and error states.
+
+Tooling
+
+Vite was chosen for its fast development experience and minimal configuration.
+
+TypeScript is used to improve reliability and reduce runtime errors.
+
+Possible Improvements
+
+Add autocomplete or suggestions for ZIP codes
+
+Cache results for previously searched ZIP codes
+
+Improve accessibility with keyboard navigation and ARIA enhancements
+
+Add unit tests for formatting and utility functions
+
+Enhance responsive behavior for very small screens

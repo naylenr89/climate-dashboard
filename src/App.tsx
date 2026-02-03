@@ -3,7 +3,8 @@ import { getLocationFromZip } from "./lib/zip";
 import { getWeather } from "./lib/weather";
 import { formatDayLabel, formatTemp } from "./lib/format";
 import type { ZipLocation, WeatherData } from "./types/weather";
-
+import WeatherIcon from "./components/WeatherIcon";
+import { FiLoader, FiSearch } from "react-icons/fi";
 
 function App() {
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "success">("idle");
@@ -25,9 +26,10 @@ function App() {
       setWeather(weatherData);
       setStatus("success");
     } catch (err: any) {
-      const msg = err?.message === "ZIP_NOT_FOUND"
-                    ? "ZIP not found. Try another 5-digit ZIP."
-                    : "Something went wrong. Please try again.";
+      const msg =
+        err?.message === "ZIP_NOT_FOUND"
+          ? "ZIP not found. Try another 5-digit ZIP."
+          : "Something went wrong. Please try again.";
 
       setError(msg);
       setStatus("error");
@@ -37,63 +39,88 @@ function App() {
   }
 
   return (
-    <div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
+    <div className="app">
+      <div className="searchRow">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
 
-          const zip = zipInput.trim();
+            const zip = zipInput.trim();
 
-          if (!/^\d{5}$/.test(zip)) {
-            setError("Enter a valid 5-digit ZIP");
-            setStatus("error");
-            return;
-          }
+            if (!/^\d{5}$/.test(zip)) {
+              setError("Enter a valid 5-digit ZIP");
+              setStatus("error");
+              return;
+            }
 
-          handleSearch(zip);
-        }}
-      >
-        <input
-          value={zipInput}
-          onChange={(e) => setZipInput(e.target.value)}
-          placeholder="Enter ZIP code"
-          maxLength={5}
-        />
+            handleSearch(zip);
+          }}
+        >
+          <input
+            value={zipInput}
+            onChange={(e) => setZipInput(e.target.value)}
+            placeholder="Zip Code"
+            maxLength={5}
+            inputMode="numeric"
+          />
 
-        <button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "Loading..." : "Search"}
-        </button>
-
-        <div style={{ marginTop: 12 }}>
-          <button type="button" onClick={() => setUnit("c")} disabled={unit === "c"}>
-            °C
+          <button type="submit" disabled={status === "loading"} aria-label="Search">
+              {status === "loading" ? <FiLoader className="spin" /> : <FiSearch size={18} />}
           </button>
-          <button type="button" onClick={() => setUnit("f")} disabled={unit === "f"}>
-            °F
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
 
-      {status === "error" && error && <p>{error}</p>}
-      {status === "loading" && <p>Loading...</p>}
+      <div className="statusRow">
+        {status === "error" && error && <div className="error">{error}</div>}
+      </div>
 
       {status === "success" && location && weather && (
-        <div>
-          <h2>
-            {location.city}, {location.state}
-          </h2>
+        <div className="card">
+          <div className="cardTop">
+            <div>
+              <p className="location">
+                {location.city}, {location.state}
+              </p>
+              <div className="tempRow">
+                <span className="temp">{formatTemp(weather.currentTempC, unit)}</span>
+              </div>
+            </div>
 
-          <p>{formatTemp(weather.currentTempC, unit)}</p>
+            <div className="iconBig">
+              <WeatherIcon code={weather.currentWeatherCode} size={96} />
+            </div>
+          </div>
 
-          <ul>
-            {weather.daily.slice(0, 5).map((day: any) => (
-              <li key={day.date}>
-                {formatDayLabel(day.date)}: {formatTemp(day.tempMinC, unit)} – {formatTemp(day.tempMaxC, unit)}
-              </li>
+          <div className="forecast">
+            {weather.daily.slice(0, 5).map((day) => (
+              <div className="dayCard" key={day.date}>
+                <div className="dayIcon">
+                  <WeatherIcon code={day.weatherCode} size={28} />
+                </div>
+                <div className="dayTemp">{formatTemp(day.tempMaxC, unit)}</div>
+                <div className="dayLabel">{formatDayLabel(day.date)}</div>
+              </div>
             ))}
-          </ul>
+          </div>
+              <div className="toggleRow">
+        <span>Fahrenheit</span>
+
+        <button
+          type="button"
+          className={`pill ${unit === "c" ? "right" : "left"}`}
+          onClick={() => setUnit((u) => (u === "c" ? "f" : "c"))}
+          aria-label="Toggle unit"
+        >
+          <span className="dot" />
+        </button>
+
+        <span>Celsius</span>
+      </div>
         </div>
+        
       )}
+
+  
     </div>
   );
 }
